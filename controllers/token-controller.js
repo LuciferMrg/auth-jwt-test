@@ -8,14 +8,14 @@ const verifyToken = (req, res, next) => {
 
         if (!token) {
             throw new ApiException('refresh_token_error', 'Refresh token is required', {
-                httpStatusCode: STATUS_CODES.FORBIDDEN,
+                httpStatusCode: STATUS_CODES.FORBIDDEN
             });
         }
 
         jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
             if (err) {
                 throw new ApiException('refresh_token_error', 'Refresh token is not valid', {
-                    httpStatusCode: STATUS_CODES.USER_NOT_AUTHORIZED,
+                    httpStatusCode: STATUS_CODES.USER_NOT_AUTHORIZED
                 });
             }
 

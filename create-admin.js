@@ -10,7 +10,7 @@ async function createAdmin() {
     const userAccount = await UserModel.create({
         name: 'test',
         email: 'admin@example.com',
-        passwordHash: bcrypt.hashSync('root', 10),
+        passwordHash: bcrypt.hashSync('root', 10)
     });
 
     console.log(`Admin created: ${userAccount.email}`);

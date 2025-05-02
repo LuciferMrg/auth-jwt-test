@@ -5,6 +5,7 @@ const UserController = require('../controllers/user-controller');
 
 const { STATUS_CODES, sendResult, sendError } = require('../utilities/utilities');
 
+// eslint-disable-next-line new-cap
 const router = express.Router();
 
 router.post('/login', (req, res, next) => {

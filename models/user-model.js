@@ -6,24 +6,24 @@ const User = sequelize.define('user', {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
-        primaryKey: true,
+        primaryKey: true
     },
     name: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: true
     },
     email: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
-        validate: { isEmail: true },
+        validate: { isEmail: true }
     },
     passwordHash: {
         type: DataTypes.STRING,
-        allowNull: false,
-    },
+        allowNull: false
+    }
 }, {
-    tableName: 'users',
+    tableName: 'users'
 });
 
 module.exports = User;
