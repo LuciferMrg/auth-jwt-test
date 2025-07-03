@@ -1,3 +1,5 @@
+const { ipAddressRegexp } = require('../constants/regexp');
+const config = require('../config');
 const STATUS_CODES = {
     // ----- INFORMATION ----- //
     CONTINUE: 100,
@@ -74,12 +76,12 @@ const STATUS_CODES = {
 class ApiException extends Error {
     constructor(code, message, options = null) {
         super(message);
-
+        
         this.code = code;
         this.name = this.constructor.name;
         this.httpStatusCode = typeof options?.httpStatusCode === 'number'
-            ? options.httpStatusCode
-            : 500;
+          ? options.httpStatusCode
+          : 500;
         this.data = options?.data;
     }
 }
@@ -90,7 +92,7 @@ const sendResult = (response, next, status, resultObject) => {
     } else {
         response.status(status).end();
     }
-
+    
     if (next) {
         next();
     }
@@ -99,17 +101,17 @@ const sendResult = (response, next, status, resultObject) => {
 const sendError = (response, next, status, error) => {
     if (error instanceof ApiException) {
         const httpStatusCode = error.httpStatusCode !== STATUS_CODES.INTERNAL_SERVER_ERROR
-            ? error.httpStatusCode
-            : status;
+          ? error.httpStatusCode
+          : status;
         const resultError = {
             name: error.code,
             message: error.message
         };
-
+        
         if (error.data) {
             resultError.data = error.data;
         }
-
+        
         response.status(httpStatusCode).json({
             error: resultError
         });
@@ -125,15 +127,47 @@ const sendError = (response, next, status, error) => {
     } else {
         response.status(status).json({ error: error.toString() });
     }
-
+    
     if (next) {
         next();
     }
+};
+
+const getJoiErrorMessage = (errorValidationObj, customMessage) => {
+    return config.mode === 'development'
+      ? errorValidationObj.message
+      : customMessage;
+};
+
+const getClientIpAddress = (req) => {
+    let ipAddress = req.headers['x-forwarded-for'] ||
+      req?.ip ||
+      req?.connection?.remoteAddress ||
+      req?.socket?.remoteAddress ||
+      req?.connection?.soket?.remoteAddress;
+    
+    if (ipAddressRegexp.test(ipAddress)) {
+        return ipAddress;
+    }
+    
+    if (ipAddressRegexp.test(req?.ip)) {
+        ipAddress = req.ip;
+    } else if (ipAddressRegexp.test(req?.connection?.remoteAddress)) {
+        ipAddress = req.connection.remoteAddress;
+    } else if (ipAddressRegexp.test(req?.socket?.remoteAddress)) {
+        ipAddress = req.socket.remoteAddress;
+    } else if (req?.connection?.soket && ipAddressRegexp.test(req?.connection?.soket?.remoteAddress)) {
+        ipAddress = req.connection.soket.remoteAddress;
+    }
+    
+    return ipAddress;
 };
 
 module.exports = {
     STATUS_CODES,
     ApiException,
     sendResult,
-    sendError
+    sendError,
+    getJoiErrorMessage,
+    getClientIpAddress
 };
